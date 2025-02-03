@@ -1,11 +1,10 @@
-// handlers/user.go
 package handlers
 
 import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
-	"github.com/JorgeSaicoski/login-go/models"
+	"github.com/JorgeSaicoski/login-go/internal/models"
 )
 
 type UserHandler struct {
