@@ -4,20 +4,17 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/JorgeSaicoski/login-go/config"
-	"github.com/JorgeSaicoski/login-go/internal/handlers"
+	"github.com/JorgeSaicoski/login-go/internal/models"
+	"github.com/JorgeSaicoski/login-go/internal/routes"
 )
 
 func main() {
 	db := config.ConnectDatabase()
-	userHandler := handlers.NewUserHandler(db)
+	subscriptionHandler := models.NewSubscriptionHandler(db)
 
 	r := gin.Default()
 
-	r.POST("/users", userHandler.Create)
-	r.GET("/users", userHandler.List)
-	r.GET("/users/:id", userHandler.Get)
-	r.PUT("/users/:id", userHandler.Update)
-	r.DELETE("/users/:id", userHandler.Delete)
+	routes.SetupSubscriptionRoutes(r, subscriptionHandler)
 
 	r.Run(":8080")
 }
