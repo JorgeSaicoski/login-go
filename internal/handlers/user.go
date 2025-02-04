@@ -21,6 +21,12 @@ func (h *UserHandler) Create(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
+
+	if err := user.HashPassword(); err != nil {
+		c.JSON(500, gin.H{"error": "Failed to hash password"})
+		return
+	}
+
 	h.DB.Create(&user)
 	c.JSON(200, user)
 }
