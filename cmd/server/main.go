@@ -11,10 +11,12 @@ import (
 func main() {
 	db := config.ConnectDatabase()
 	subscriptionHandler := models.NewSubscriptionHandler(db)
+	userHandler := models.NewUserHandler()
 
 	r := gin.Default()
 
 	routes.SetupSubscriptionRoutes(r, subscriptionHandler)
+	routes.SetupUserRoutes(r, userHandler)
 
 	r.Run(":8080")
 }
