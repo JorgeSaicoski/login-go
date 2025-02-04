@@ -11,7 +11,7 @@ import (
 func main() {
 	db := config.ConnectDatabase()
 	subscriptionHandler := models.NewSubscriptionHandler(db)
-	userHandler := models.NewUserHandler()
+	userHandler := models.NewUserHandler(db)
 
 	r := gin.Default()
 
