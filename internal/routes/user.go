@@ -3,13 +3,13 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/JorgeSaicoski/login-go/internal/models"
+	"github.com/JorgeSaicoski/login-go/internal/handlers"
 )
 
-func SetupSubscriptionRoutes(r *gin.Engine, subscriptionHandler *models.SubscriptionHandler) {
-	subscription := r.Group("/subscription")
+func SetupUserRoutes(r *gin.Engine, userHandler *handlers.UserHandler) {
+	user := r.Group("/user")
 	{
-		subscription.GET("/:id", subscriptionHandler.GetByID)
-		subscription.PATCH("/:id", subscriptionHandler.UpdateByID)
+		user.GET("/:id", userHandler.GetByID)
+		user.PATCH("/:id", userHandler.UpdateByID)
 	}
 }
