@@ -2,28 +2,35 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 
 	"github.com/JorgeSaicoski/login-go/internal/models"
+	"github.com/JorgeSaicoski/login-go/internal/repository"
 )
 
 type UserHandler struct {
-	DB *gorm.DB
+	repo *repository.UserRepository
 }
 
-func NewUserHandler(db *gorm.DB) *UserHandler {
-	return &UserHandler{DB: db}
+func NewUserHandler(repo *repository.UserRepository) *UserHandler {
+	return &UserHandler{
+		repo: repo,
+	}
 }
 
 func (h *UserHandler) UpdateByID(c *gin.Context) {
-	// Get user ID from URL parameter
-	id := c.Param("id")
+	// Convert ID from string to uint
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
 
 	// Find existing user
-	var user models.User
-	if err := h.DB.First(&user, id).Error; err != nil {
+	user, err := h.repo.GetByID(uint(id))
+	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
@@ -40,7 +47,7 @@ func (h *UserHandler) UpdateByID(c *gin.Context) {
 	user.Email = updateData.Email
 
 	// Save changes to database
-	if err := h.DB.Save(&user).Error; err != nil {
+	if err := h.repo.Update(user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
 		return
 	}
@@ -50,10 +57,14 @@ func (h *UserHandler) UpdateByID(c *gin.Context) {
 }
 
 func (h *UserHandler) GetByID(c *gin.Context) {
-	id := c.Param("id")
-	var user models.User
-
-	if err := h.DB.First(&user, id).Error; err != nil {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+	// Find existing user
+	user, err := h.repo.GetByID(uint(id))
+	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}

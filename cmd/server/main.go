@@ -4,14 +4,17 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/JorgeSaicoski/login-go/config"
-	"github.com/JorgeSaicoski/login-go/internal/models"
+	"github.com/JorgeSaicoski/login-go/internal/handlers"
+	"github.com/JorgeSaicoski/login-go/internal/repository"
 	"github.com/JorgeSaicoski/login-go/internal/routes"
 )
 
 func main() {
 	db := config.ConnectDatabase()
-	subscriptionHandler := models.NewSubscriptionHandler(db)
-	userHandler := models.NewUserHandler(db)
+	subscriptionRepo := repository.NewSubscriptionRepository(db)
+	subscriptionHandler := handlers.NewSubscriptionHandler(subscriptionRepo)
+	userRepo := repository.NewUserRepository(db)
+	userHandler := handlers.NewUserHandler(userRepo)
 
 	r := gin.Default()
 

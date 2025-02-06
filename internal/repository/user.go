@@ -35,3 +35,10 @@ func (r *UserRepository) GetByEmail(email string) (*models.User, error) {
 	}
 	return &user, nil
 }
+
+func (r *UserRepository) Update(user *models.User) error {
+	if err := r.DB.Save(user).Error; err != nil {
+		return errors.New("failed to update user")
+	}
+	return nil
+}
