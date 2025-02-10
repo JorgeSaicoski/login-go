@@ -42,3 +42,42 @@ func (r *UserRepository) Update(user *models.User) error {
 	}
 	return nil
 }
+
+func (r *UserRepository) Create(user *models.User) error {
+	// Hash the password before saving
+	if err := user.HashPassword(); err != nil {
+		return errors.New("failed to hash password")
+	}
+
+	// Check if user with same email already exists
+	if _, err := r.GetByEmail(user.Email); err == nil {
+		return errors.New("user with this email already exists")
+	}
+
+	// Check if username already exists
+	if _, err := r.GetByUsername(user.UsernameForLogin); err == nil {
+		return errors.New("username already taken")
+	}
+
+	// Create the user
+	if err := r.DB.Create(user).Error; err != nil {
+		return errors.New("failed to create user")
+	}
+
+	return nil
+}
+
+func (r *UserRepository) Login(username, password string) (*models.User, error) {
+	// Get user by username
+	user, err := r.GetByUsername(username)
+	if err != nil {
+		return nil, errors.New("invalid credentials")
+	}
+
+	// Check password
+	if err := user.CheckPassword(password); err != nil {
+		return nil, errors.New("invalid credentials")
+	}
+
+	return user, nil
+}

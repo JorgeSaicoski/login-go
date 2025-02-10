@@ -20,6 +20,11 @@ func NewUserHandler(repo *repository.UserRepository) *UserHandler {
 	}
 }
 
+type LoginRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 func (h *UserHandler) UpdateByID(c *gin.Context) {
 	// Convert ID from string to uint
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
@@ -68,6 +73,55 @@ func (h *UserHandler) GetByID(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+func (h *UserHandler) Create(c *gin.Context) {
+	var user models.User
+
+	// Bind JSON request body to user struct
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Validate required fields
+	if user.Email == "" || user.Password == "" || user.UsernameForLogin == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "email, username and password are required"})
+		return
+	}
+
+	// Create user using repository
+	if err := h.repo.Create(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Don't return the password in the response
+	user.Password = ""
+
+	c.JSON(http.StatusCreated, user)
+}
+
+func (h *UserHandler) Login(c *gin.Context) {
+	var req LoginRequest
+
+	// Bind JSON request body
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Attempt login using repository
+	user, err := h.repo.Login(req.Username, req.Password)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Don't return the password in the response
+	user.Password = ""
 
 	c.JSON(http.StatusOK, user)
 }
