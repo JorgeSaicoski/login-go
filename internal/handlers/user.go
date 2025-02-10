@@ -103,25 +103,3 @@ func (h *UserHandler) Create(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, user)
 }
-
-func (h *UserHandler) Login(c *gin.Context) {
-	var req LoginRequest
-
-	// Bind JSON request body
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Attempt login using repository
-	user, err := h.repo.Login(req.Username, req.Password)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Don't return the password in the response
-	user.Password = ""
-
-	c.JSON(http.StatusOK, user)
-}

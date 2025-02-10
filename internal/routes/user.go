@@ -11,5 +11,6 @@ func SetupUserRoutes(r *gin.Engine, userHandler *handlers.UserHandler) {
 	{
 		user.GET("/:id", userHandler.GetByID)
 		user.PATCH("/:id", userHandler.UpdateByID)
+		user.POST("/register", userHandler.Create)
 	}
 }
