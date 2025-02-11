@@ -8,12 +8,14 @@ import (
 )
 
 type User struct {
-	ID               uint      `json:"id" gorm:"primaryKey"`
-	Name             string    `json:"name"`
-	UsernameForLogin string    `json:"username"`
-	Email            string    `json:"email"`
-	Password         string    `json:"-"` // "-" means it won't be included in JSON responses
-	CreatedAt        time.Time `json:"created_at"`
+	ID               uint               `json:"id" gorm:"primaryKey"`
+	Name             string             `json:"name"`
+	UsernameForLogin string             `json:"username"`
+	Email            string             `json:"email"`
+	Password         string             `json:"-"`
+	Subscriptions    []UserSubscription `json:"subscriptions" gorm:"foreignKey:UserID"`
+	CreatedAt        time.Time          `json:"created_at"`
+	UpdatedAt        time.Time          `json:"updated_at"`
 }
 
 type Claims struct {
