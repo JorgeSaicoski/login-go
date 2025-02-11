@@ -7,9 +7,14 @@ import (
 )
 
 func SetupUserSubscriptionRoutes(r *gin.Engine, handler *handlers.UserSubscriptionHandler) {
-	userSub := r.Group("/user-subscription")
+	// Nested under user routes for better resource hierarchy
+	user := r.Group("/user")
 	{
-		userSub.POST("/", handler.Create)
-		userSub.GET("/user/:userId", handler.GetUserSubscriptions)
+		// Get all subscriptions for a user
+		user.GET("/:userId/subscription", handler.GetUserSubscriptions)
+		// Create/Assign a specific subscription to a user
+		user.POST("/:userId/subscription/:subscriptionId", handler.Create)
+		// Update a specific user's subscription
+		user.PATCH("/:userId/subscription/:subscriptionId", handler.UpdateUserSubscription)
 	}
 }
