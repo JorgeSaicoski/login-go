@@ -12,17 +12,25 @@ import (
 
 func main() {
 	db := config.ConnectDatabase()
+
+	// Initialize repositories
 	subscriptionRepo := repository.NewSubscriptionRepository(db)
-	subscriptionHandler := handlers.NewSubscriptionHandler(subscriptionRepo)
 	userRepo := repository.NewUserRepository(db)
+	userSubscriptionRepo := repository.NewUserSubscriptionRepository(db)
+
+	// Initialize handlers
+	subscriptionHandler := handlers.NewSubscriptionHandler(subscriptionRepo)
 	userHandler := handlers.NewUserHandler(userRepo)
+	userSubscriptionHandler := handlers.NewUserSubscriptionHandler(userSubscriptionRepo)
 	authService := services.NewAuthService(userRepo)
 	authHandler := handlers.NewAuthHandler(authService, userRepo)
 
 	r := gin.Default()
 
+	// Setup routes
 	routes.SetupSubscriptionRoutes(r, subscriptionHandler)
 	routes.SetupUserRoutes(r, userHandler)
+	routes.SetupUserSubscriptionRoutes(r, userSubscriptionHandler)
 	routes.SetupAuthRoutes(r, authHandler)
 
 	r.Run(":8080")
